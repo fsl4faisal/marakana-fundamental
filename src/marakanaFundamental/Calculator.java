@@ -1,9 +1,25 @@
 package marakanaFundamental;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Stack;
 
+import marakanaFundamental.expressions.Expression;
+import marakanaFundamental.expressions.NumberExpression;
+import marakanaFundamental.expressions.OperationExpression;
+
 public class Calculator {
-	Stack<Integer> stack;
+	Stack<Expression> stack;
+	private static final Map<String, Operator> operators;
+	
+	static {
+		operators=new HashMap<>();
+		operators.put("+",Operator.ADD);
+		operators.put("-",Operator.SUBTRACT);
+		operators.put("*",Operator.MULTIPLY);
+		operators.put("/",Operator.DIVIDE);
+
+	}
 
 	public Calculator() {
 		super();
@@ -26,6 +42,11 @@ public class Calculator {
 	}
 
 	public int calculate(String expression) {
+		return parse(expression).getValue();
+		
+	}
+	
+	public Expression parse(String expression) {
 		String[] tokens = expression.split(" ");
 
 		for (String token : tokens) {
@@ -41,7 +62,7 @@ public class Calculator {
 
 		try {
 			int number = Integer.parseInt(token);
-			stack.push(number);
+			stack.push(new NumberExpression(number));
 			return true;
 		} catch (NumberFormatException e) {
 			return false;
@@ -51,29 +72,18 @@ public class Calculator {
 
 	public boolean handleOperator(String token) {
 
-		int lhs, rhs;
-		Operator op;
-
-		switch (token) {
-		case "+":
-			op=new Add();
-			break;
-		case "-":
-			op=new Subtract();
-			break;
-		case "/":
-			op=new Divide();
-			break;
-		case "*":
-			op=new Subtract();
-			break;
-		default:
+		Expression lhs, rhs;
+		Operator op=operators.get(token);
+		if(op == null)
 			return false;
-		}
-		rhs=stack.pop();
-		lhs=stack.pop();
-		stack.push(op.operate(lhs, rhs));
-		System.out.println(stack.peek());
-		return true;
+
+			rhs = stack.pop();
+			lhs = stack.pop();
+			stack.push(new OperationExpression(lhs, rhs, op));
+//			stack.push(operators.get(token).operate(lhs.getValue(), rhs.getValue()));
+			System.out.println(stack.peek());
+			return true;
+		
+	
 	}
 }

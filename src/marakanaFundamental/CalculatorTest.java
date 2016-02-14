@@ -1,8 +1,11 @@
 package marakanaFundamental;
 
-import static org.junit.Assert.*;
-
-import java.util.Stack;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import marakanaFundamental.expressions.Expression;
+import marakanaFundamental.expressions.NumberExpression;
+import marakanaFundamental.expressions.OperationExpression;
 
 import org.junit.Test;
 
@@ -33,15 +36,18 @@ public class CalculatorTest {
 
 	@Test
 	public void handleNumberMustHandleNumbers() {
+		System.out.println("In handleNumberMustHandleNumbers");
 		Calculator calc=new Calculator();
 		boolean result =calc.handleNumber("5");
 		assertTrue(result);
 		assertEquals(1, calc.stack.size());
-		assertEquals(5, (int) calc.stack.peek());
+		assertEquals(new NumberExpression(5),calc.stack.peek());
 	}
 
 	@Test
 	public void handleNumberMustNotHandleGarbage() {
+		System.out.println("In handleNumberMustNotHandleGarbage");
+
 		Calculator calc=new Calculator();
 		boolean result = calc.handleNumber("a");
 		assertFalse(result);
@@ -50,20 +56,22 @@ public class CalculatorTest {
 
 	@Test
 	public void handleOperatorMustHandleAddition() {
+System.out.println("in handleOperatorMustHandleAddition");
 		Calculator calc=new Calculator();		
-		calc.stack.push(5);
-		calc.stack.push(10);
+		calc.stack.push(new NumberExpression(5));
+		calc.stack.push(new NumberExpression(10));
 		boolean result = calc.handleOperator("+");
 		assertTrue(result);
 		assertEquals(1, calc.stack.size());
-		assertEquals(15, (int) calc.stack.peek());
+		assertEquals(new OperationExpression(new NumberExpression(5), new NumberExpression(10), Operator.ADD), calc.stack.peek());
 	}
 
 	@Test
 	public void handleOperatorMustNotHandleGarbage() {
+		System.out.println("handleOperatorMustNotHandleGarbage");
 		Calculator calc=new Calculator();
-		calc.stack.push(5);
-		calc.stack.push(10);
+		calc.stack.push(new NumberExpression(5));
+		calc.stack.push(new NumberExpression(10));
 		boolean result = calc.handleOperator("a");
 		assertFalse(result);
 		assertEquals(2, calc.stack.size());
@@ -71,6 +79,7 @@ public class CalculatorTest {
 
 	@Test
 	public void onePlusOneMustEqualTwo() {
+		System.out.println("onePlusOneMustEqualTwo");
 		// int result=Calculator.calculate("1 1 +");
 		Calculator calc=new Calculator();
 		assertEquals(2, calc.calculate("1 1 +"));
@@ -78,8 +87,15 @@ public class CalculatorTest {
 	
 	@Test(expected = IllegalArgumentException.class)
 	public void calculatorMustNotAcceptGarbage(){
+		System.out.println("calculatorMustNotAcceptGarbage");
 		Calculator calc=new Calculator();
 		calc.calculate("1 1 1 2 + - + k ");
+	}
+	
+	@Test
+	public void toStringMustConvertExpressionToInfix(){
+		Expression e=new Calculator().parse("1 2 3 + -");
+		assertEquals("( 1 - ( 2 + 3 ) )",e.toString());
 	}
 
 }

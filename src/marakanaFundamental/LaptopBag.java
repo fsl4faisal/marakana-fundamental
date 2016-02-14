@@ -30,6 +30,7 @@ public class LaptopBag {
 	public int getSize() {
 		return size;
 	}
+	
 
 	
 }
